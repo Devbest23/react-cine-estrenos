@@ -1,8 +1,9 @@
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ORDENES, type Genero, type Orden } from '../models/pelicula'
+import { useState, type FormEvent } from 'react'
 
 interface Props {
   busqueda: string
@@ -15,21 +16,37 @@ interface Props {
 }
 
 // TODO M3: recibir también busqueda y onBuscar
-export function FiltrosPeliculas({ genero, orden, generos, onGenero, onOrden }: Props) {
+export function FiltrosPeliculas({busqueda, onBuscar, genero, orden, generos, onGenero, onOrden }: Props) {
+  const [texto, setTexto] = useState(busqueda)
   // TODO M3: el texto del input en su propio useState (input controlado)
   // TODO M3: enviar(e): e.preventDefault() y avisar al padre con onBuscar(texto.trim())
 
   // TMDB no deja combinar búsqueda por texto con género u orden
-  const buscando = false // TODO M3: busqueda !== ''
+  function enviar(e: FormEvent<HTMLFormElement>){
+    e.preventDefault()
+    onBuscar(texto.trim())
+  }
+  const buscando = busqueda !== ''// TODO M3: busqueda !== ''
+  function Limpiar() {
+    setTexto('')
+    onBuscar("")
+  }
+
 
   return (
     <div className="mb-8 flex flex-wrap items-end gap-3">
       {/* TODO M3: onSubmit={enviar} */}
-      <form onSubmit={(e) => e.preventDefault()} className="flex min-w-64 flex-1 gap-2" role="search">
+      <form onSubmit={enviar} className="flex min-w-64 flex-1 gap-2" role="search">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           {/* TODO M3: value={texto} y onChange */}
-          <Input placeholder="Buscar por título…" aria-label="Buscar película" className="pl-9" />
+          <Input  value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Buscar por título…" aria-label="Buscar película" className="pl-9" />
+          {texto && (
+            <button type='button' onClick={Limpiar}  className='absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover::text foreground'>
+              <X className="size-4"/>
+            </button>
+          )
+          }          
           {/* TODO M3: botón X para limpiar, solo si hay texto */}
         </div>
         <Button type="submit">Buscar</Button>

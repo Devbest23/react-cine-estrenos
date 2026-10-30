@@ -11,6 +11,20 @@ export interface FiltrosListado {
   orden?: Orden
 }
 
+export type RegionEstrenos = 'VE' | 'MX' | 'ES' | 'US'
+
+export async function obtenerEstrenos(
+  pagina: number,
+  signal?: AbortSignal,
+  region: RegionEstrenos = 'VE',
+) {
+  const { data } = await tmdb.get<Pagina<Pelicula>>('/movie/upcoming', {
+    params: { page: pagina, region, include_adult: false },
+    signal,
+  })
+  return data
+}
+
 // /discover filtra por género y ordena, pero NO busca por texto
 export async function descubrir({ pagina, genero, orden = 'popularity.desc' }: FiltrosListado, signal?: AbortSignal) {
   const { data } = await tmdb.get<Pagina<Pelicula>>('/discover/movie', {

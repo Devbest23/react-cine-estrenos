@@ -1,4 +1,5 @@
 import { Film } from 'lucide-react'
+import { Link } from 'react-router'
 import { imagen } from '@/core/config/tmdb'
 import { anio, type PeliculaResumen } from '../models/pelicula'
 import { BotonFavorito } from './BotonFavorito'
@@ -13,13 +14,13 @@ interface Props {
 
 // Componente de presentación: todo le llega por props; no pide datos ni tiene estado.
 // Lo que en Angular era output(), aquí es una función que llega como prop (onFavorito).
-// TODO M1: recibir también onFavorito
-export function PeliculaCard({ pelicula, favorita }: Props) {
+// : recibir también onFavorito
+export function PeliculaCard({ pelicula, favorita, onFavorito }: Props) {
   const poster = imagen(pelicula.poster_path)
 
   return (
     <article className="group relative">
-      <div>
+      <Link to={`/peliculas/${pelicula.id}`} className="block rounded-xl focus-visible:outline-2 focus-visible:outline-primary">
         <div className="aspect-2/3 overflow-hidden rounded-xl bg-card ring-1 ring-border transition group-hover:ring-primary/60">
           {/* Ternario en JSX: imagen si hay póster, ícono si no */}
           {poster ? (
@@ -43,10 +44,10 @@ export function PeliculaCard({ pelicula, favorita }: Props) {
           {/* && : si no hay votos, no se pinta nada */}
           {pelicula.vote_average > 0 && <Calificacion valor={pelicula.vote_average} />}
         </div>
-      </div>
+      </Link>
 
-      {/* TODO M1: al hacer clic, avisar al padre con onFavorito(pelicula) */}
-      <BotonFavorito activo={favorita} onAlternar={() => {}} className="absolute top-2 right-2" />
+      {/* : al hacer clic, avisar al padre con onFavorito(pelicula) */}
+      <BotonFavorito activo={favorita} onAlternar={() => onFavorito(pelicula)} className="absolute top-2 right-2" />
     </article>
   )
 }

@@ -1,21 +1,35 @@
+import { Outlet } from 'react-router'
 import { Header } from '@/core/layout/Header'
-import { CatalogoPeliculas } from '@/features/peliculas/pages/CatalogoPeliculas'
+import type { PeliculaResumen } from '@/features/peliculas/models/pelicula'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
-// App es el componente raíz: arma la pantalla y guarda el estado que comparten varias partes.
+export interface ContextoApp {
+  favoritas: PeliculaResumen[]
+  esFavorita: (id: number) => boolean
+  onFavorito: (pelicula: PeliculaResumen) => void
+}
+
 export default function App() {
-  // TODO M1: guardar las favoritas con useState<PeliculaResumen[]>([])
-  // TODO M1: escribir alternarFavorita(p): si ya está la quita (filter), si no la agrega ([...favoritas, p])
-  // TODO M2: guardar la vista actual con useState<Vista>('catalogo')
+  const [favoritas, setFavoritas] = useState<PeliculaResumen[]>([])
+
+  const esFavorita = (id: number) => favoritas.some((favorita) => favorita.id === id)
+  function alternarFavorita(p: PeliculaResumen) {
+    if (esFavorita(p.id)) {
+      setFavoritas((actuales) => actuales.filter((favorita) => favorita.id !== p.id))
+      toast(`Quitaste ${p.title} de favoritos`)
+    } else {
+      setFavoritas((actuales) => [...actuales, p])
+      toast.success(`${p.title} agregada a favoritas`)
+    }
+  }
 
   return (
     <div className="flex min-h-dvh flex-col">
-      {/* TODO M1: totalFavoritas={favoritas.length}   TODO M2: vista y onCambiarVista */}
-      <Header vista="catalogo" totalFavoritas={0} onCambiarVista={() => {}} />
+      <Header totalFavoritas={favoritas.length} />
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-8">
-        {/* TODO M1: pasar esFavorita y onFavorito de verdad */}
-        {/* TODO M2: según la vista, pintar CatalogoPeliculas o MisFavoritas */}
-        <CatalogoPeliculas esFavorita={() => false} onFavorito={() => {}} />
+<Outlet context={{ favoritas, esFavorita, onFavorito: alternarFavorita } satisfies ContextoApp} />
       </main>
 
       <footer className="border-t py-6 text-center text-xs text-muted-foreground">
